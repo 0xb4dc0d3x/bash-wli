@@ -26,59 +26,121 @@
 #    echo '1 to disconnect.'
 #    read operation
 # }
+supported_array=("8" "11" "10" "9" "20.04" "18.04" "16.04")
 
-checkWarp() {
-    echo "check for warp=on or warp=off to make sure warp is connected or not"
-    curl https://www.cloudflare.com/cdn-cgi/trace/
+startup_function(){
+    echo " ____    __    ____  ___      .______      .______             ______  __       __  "
+    echo " \   \  /  \  /   / /   \     |   _  \     |   _  \           /      ||  |     |  | "
+    echo "  \   \/    \/   / /  ^  \    |  |_)  |    |  |_)  |  ______ |  ,----'|  |     |  | "
+    echo "   \            / /  /_\  \   |      /     |   ___/  |______||  |     |  |     |  | "
+    echo "    \    /\    / /  _____  \  |  |\  \---- |  |              |  ----.||   ----.|  | "
+    echo "     \__/  \__/ /__/     \__\ | _| ._____| | _|               \______||_______||__| "
+    echo ""
+    echo " warp-cli bash created by 0xb4dc0d3x"
+
+}
+
+checkwarp_function() {
+    echo ""
+    echo " check for warp=on or warp=off to make sure warp is connected or not"
+    curl -s https://www.cloudflare.com/cdn-cgi/trace/ >> checkwarp.txt
+    source checkwarp.txt
+    echo " $warp"
 }
 
 connect_function(){
-    warp-cli connect
-    checkWarp
+    echo " $(warp-cli enable-always-on)"
+    checkwarp_function
     main_function
 }
 
 disconnect_function(){
-    warp-cli disconnect
-    checkWarp
+    echo " $(warp-cli disconnect)"
+    checkwarp_function
     main_function
 }
 
-register_function(){
-    warp-cli register
-    main_function
+installing_function(){
+    if [ $(uname -m) == "x86_64" ]; then
+        echo " Supported"
+        echo " Finding your version of OS"
+        for i in "${supported_array[@]}"
+        do
+            # echo $i
+            if [[ $(grep 'VERSION_ID' /etc/os-release) == *"$i"* ]]; then
+                echo " Found"
+                if [[ $(grep 'VERSION_ID' /etc/os-release) == *"11"* ]] || [[ $(grep 'VERSION_ID' /etc/os-release) == *"10"* ]] || [[ $(grep 'VERSION_ID' /etc/os-release) == *"9"* ]] || [[ $(grep 'VERSION_ID' /etc/os-release) == *"20.04"* ]] || [[ $(grep 'VERSION_ID' /etc/os-release) == *"18.04"* ]] || [[ $(grep 'VERSION_ID' /etc/os-release) == *"16.04"* ]]; then
+                    curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+                    case $i in
+                        11) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bullseye main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                        10) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ buster main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                        9) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ stretch main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                        20.04) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ focal main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;            
+                        18.04) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bionic main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                        16.04) 
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ xenial main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                        *)
+                            echo "something went wrong" ;;
+                    esac
+                    sudo apt-get update
+                else
+                    rpm -ivh https://pkg.cloudflareclient.com/cloudflare-release-el8.rpm
+                fi
+            fi
+        done
+    fi
+    # release=""
+    # grep 'VERSION_ID' /etc/os-release
+    # source result.txt
+    # release=$VERSION_ID
+    # echo $VERSION_ID
+    
+    # for (( i=0; i<=${#myarray[@]}; i++ )); do
+    #     if [  ]
+    #     echo "${myarray[$i]}"
+    # done
+    
 }
 
 main_function(){
-echo "Hello, welcome warp-cli bash controller"
-echo "if you are not registered to warp-cli press 2"
-echo "press 0 to connect"
-echo "press 1 to disconnect"
-echo "press 9 to exit"
+    echo ""
+    echo " Hello, welcome warp-cli bash controller"
+    echo " if you are not installed warp-cli press 2"
+    echo " press 0 to connect"
+    echo " press 1 to disconnect"
+    echo " press 9 to exit"
 
-read input
+    read -p " " input
 
-if [ $input -eq 0 ]; then
-    echo "you want to connect to warp"
-    connect_function
+    if [ $input -eq 0 ]; then
+        echo " you want to connect to warp"
+        connect_function
 
-elif [ $input -eq 1 ]; then
-    echo "you want to disconnect from warp"
-    disconnect_function
+    elif [ $input -eq 1 ]; then
+        echo " you want to disconnect from warp"
+        disconnect_function
 
-elif [ $input -eq 2 ]; then
-    echo "registeing to warp-cli"
-    register_function
+    elif [ $input -eq 2 ]; then
+        echo " installing warp-cli"
+        installing_function
 
-elif [ $input -eq 9 ]; then
-    echo 'exiting...'
-    exit
+    elif [ $input -eq 9 ]; then
+        echo ' exiting...'
+        exit
 
-else
-    echo "wrong operation"
-    echo "0, 1, 2 and 9 are valid"
-    main_function
+    else
+        echo " wrong operation"
+        echo " 0, 1, 2 and 9 are valid"
+        main_function
 
-fi
+    fi
 }
+
+startup_function
+echo ""
 main_function
