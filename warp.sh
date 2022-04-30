@@ -1,31 +1,5 @@
 #!/bin/bash
 
-# wrong() {
-#     echo "press 0 to connect"
-#     echo "press 1 to disconnect"
-#     echo ""
-#     read inputInWrongFunc
-
-#     if [ $inputInWrongFunc -eq 0 ]; then
-#         echo "connecting to warp"
-#         connect_function
-
-#     elif [ $inputInWrongFunc -eq 1 ]; then
-#         echo "disconnecting from warp"
-#         disconnect_function
-
-#     else
-#        echo 'bad operation, Try again!'
-#        wrong
-#     fi
-# }
-#
-# what_to_do_next(){
-#    echo 'ok done that whats next'
-#    echo '0 to connect.'
-#    echo '1 to disconnect.'
-#    read operation
-# }
 supported_array=("8" "11" "10" "9" "20.04" "18.04" "16.04")
 
 startup_function(){
@@ -73,38 +47,39 @@ installing_function(){
                     curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
                     case $i in
                         11) 
-                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bullseye main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                            $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bullseye main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) 
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         10) 
                             $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ buster main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         9) 
                             $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ stretch main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         20.04) 
                             $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ focal main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;            
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         18.04) 
                             $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bionic main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         16.04) 
                             $(echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ xenial main' | sudo tee /etc/apt/sources.list.d/cloudflare-client.list) ;;
+                            sudo apt update ;
+                            sudo apt install cloudflare-warp ;;
                         *)
                             echo "something went wrong" ;;
                     esac
-                    sudo apt-get update
                 else
                     rpm -ivh https://pkg.cloudflareclient.com/cloudflare-release-el8.rpm
+                    sudo yum install cloudflare-warp
                 fi
             fi
         done
-    fi
-    # release=""
-    # grep 'VERSION_ID' /etc/os-release
-    # source result.txt
-    # release=$VERSION_ID
-    # echo $VERSION_ID
-    
-    # for (( i=0; i<=${#myarray[@]}; i++ )); do
-    #     if [  ]
-    #     echo "${myarray[$i]}"
-    # done
-    
+    fi    
 }
 
 main_function(){
